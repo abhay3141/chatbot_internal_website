@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PGADM Internal Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 100px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #content {
+            margin-top: 30px;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>PGADM Internal Website</h1>
+    <button onclick="updateContent()">Click to add updated content of the website</button>
+    <div id="outputMsg"></div>
+
+    <script>
+        function updateContent() {
+            fetch('https://fastapi-service-1042841820988.us-central1.run.app/web_scrapping', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                const contentDiv = document.getElementById('outputMsg');
+                contentDiv.innerText = data.status;
+            })
+            .catch(error => {
+                console.log('Error:', error);
+                const contentDiv = document.getElementById('outputMsg');
+                contentDiv.innerText = "something went wrong :(";
+            });
+        }
+    </script>
+</body>
+</html>
