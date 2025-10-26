@@ -81,14 +81,14 @@
                     });
                 }
 
-                tableHTML += 
+                tableHTML += `
                     <tr>
                         <td>${user.Email || ""}</td>
                         <td>${user["Conversation ID"] || ""}</td>
                         <td>${user["Conversations Created At"] || ""}</td>
                         <td><pre style="white-space: pre-wrap;">${formattedMessages}</pre></td>
                     </tr>
-                ;
+                `;
             });
 
             tableHTML += "</table>";
