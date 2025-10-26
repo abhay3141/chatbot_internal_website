@@ -47,6 +47,39 @@
                 contentDiv.innerText = "something went wrong :(";
             });
         }
+
+        async function loadTableData() {
+        const response = await fetch('https://fastapi-service-1042841820988.us-central1.run.app/get_conversations_json');
+        const data = await response.json();
+        displayTable(data);
+        }
+
+        function displayTable(data) {
+            const container = document.getElementById('tableContainer');
+            if (!data || data.length === 0) {
+                container.innerHTML = "<p>No data found.</p>";
+                return;
+            }
+
+            let tableHTML = "<table border='1'>";
+            tableHTML += "<tr><th>Email</th><th>Conversation ID</th><th>Created At</th><th>Messages</th></tr>";
+
+            data.forEach(item => {
+                tableHTML += `
+                    <tr>
+                        <td>${item.Email || ""}</td>
+                        <td>${item["Conversation ID"] || ""}</td>
+                        <td>${item["Conversations Created At"] || ""}</td>
+                        <td><pre>${item.Messages || ""}</pre></td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += "</table>";
+            container.innerHTML = tableHTML;
+        }
+
+        loadTableData();
     </script>
 </body>
 </html>
