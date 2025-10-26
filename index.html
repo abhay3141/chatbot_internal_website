@@ -64,15 +64,19 @@
             }
 
             let tableHTML = "<table border='1'>";
-            tableHTML += "<tr><th>Email</th><th>Conversation ID</th><th>Created At</th><th>Messages</th></tr>";
+            tableHTML += "<tr><th>Email</th><th>Name</th><th>Conversation ID</th><th>Conversation Created</th><th>Messages</th></tr>";
 
-            data.forEach(item => {
+            data.forEach(user => {
+                // Assuming Name is not present, set empty or extract from email
+                const name = user.Email ? user.Email.split("@")[0] : "";
+
                 tableHTML += `
                     <tr>
-                        <td>${item.Email || ""}</td>
-                        <td>${item["Conversation ID"] || ""}</td>
-                        <td>${item["Conversations Created At"] || ""}</td>
-                        <td><pre>${item.Messages || ""}</pre></td>
+                        <td>${user.Email || ""}</td>
+                        <td>${name}</td>
+                        <td>${user["Conversation ID"] || ""}</td>
+                        <td>${user["Conversations Created At"] || ""}</td>
+                        <td><pre>${user.Messages || ""}</pre></td>
                     </tr>
                 `;
             });
