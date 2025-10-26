@@ -25,8 +25,10 @@
 <body>
     <h1>PGADM Internal Website</h1>
     <button onclick="updateContent()">Click to add updated content of the website</button>
-    <div id="outputMsg"></div>
+    <button onclick="refreshTable()">Click to Refresh Table</button>
 
+    <div id="outputMsg"></div>
+    <div id="tableContainer" style="margin-top:20px;"></div>
     <script>
         function updateContent() {
             fetch('https://fastapi-service-1042841820988.us-central1.run.app/web_scrapping', {
@@ -77,6 +79,21 @@
 
             tableHTML += "</table>";
             container.innerHTML = tableHTML;
+        }
+
+        async function refreshTable() {
+            try {
+                // Call a dummy API
+                await fetch('https://fastapi-service-1042841820988.us-central1.run.app/dummy_refresh', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                // Reload table after refresh
+                await loadTableData();
+            } catch (err) {
+                console.error("Refresh error:", err);
+            }
         }
 
         loadTableData();
