@@ -70,7 +70,7 @@
                 let messagePairs = [];
 
                 if (user.Messages) {
-                    const lines = user.Messages.split("\n").map(line => line.trim()).filter(line => line !== "");
+                    const lines = user.Messages.split("\n").filter(line => line.trim() !== "");
 
                     let currentQuery = null;
 
@@ -81,12 +81,13 @@
                         if (queryMatch) {
                             currentQuery = {
                                 timestamp: new Date(queryMatch[1].trim()),
-                                query: queryMatch[2].trim(),
+                                originalTimestamp: queryMatch[1].trim(),
+                                query: queryMatch[2], // keep original spacing
                                 response: ""
                             };
                             messagePairs.push(currentQuery);
                         } else if (responseMatch && currentQuery) {
-                            currentQuery.response = responseMatch[1].trim();
+                            currentQuery.response = responseMatch[1]; // keep original spacing
                             currentQuery = null;
                         }
                     });
@@ -95,10 +96,10 @@
                     messagePairs.sort((a, b) => a.timestamp - b.timestamp);
                 }
 
-                // Format the messages
+                // Format the messages with bold [Query] and [Response]
                 let formattedMessages = "";
-                messagePairs.forEach((pair, index) => {
-                    formattedMessages += `<b>[Query | ${pair.timestamp.toISOString()}]</b>: ${pair.query}\n`;
+                messagePairs.forEach(pair => {
+                    formattedMessages += `<b>[Query | ${pair.originalTimestamp}]</b>: ${pair.query}\n`;
                     formattedMessages += `<b>[Response]</b>: ${pair.response}\n`;
                 });
 
@@ -114,7 +115,7 @@
 
             tableHTML += "</table>";
             container.innerHTML = tableHTML;
-}
+        }
 
         async function refreshTable() {
             try {
