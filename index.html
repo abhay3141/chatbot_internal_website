@@ -63,20 +63,30 @@
                 return;
             }
 
-            let tableHTML = "<table border='1'>";
-            tableHTML += "<tr><th>Email</th><th>Name</th><th>Conversation ID</th><th>Conversation Created</th><th>Messages</th></tr>";
+            let tableHTML = "<table border='1' style='border-collapse: collapse; width: 100%;'>";
+            tableHTML += "<tr><th>Email</th><th>Conversation ID</th><th>Conversation Created</th><th>Messages</th></tr>";
 
             data.forEach(user => {
-                // Assuming Name is not present, set empty or extract from email
-                const name = user.Email ? user.Email.split("@")[0] : "";
+                let formattedMessages = "";
+
+                if (user.Messages) {
+                    // Split messages into lines
+                    const lines = user.Messages.split("\n");
+
+                    // Add line breaks for each query/response pair
+                    lines.forEach(line => {
+                        if (line.trim() !== "") {
+                            formattedMessages += line.trim() + "\n";
+                        }
+                    });
+                }
 
                 tableHTML += `
                     <tr>
                         <td>${user.Email || ""}</td>
-                        <td>${name}</td>
                         <td>${user["Conversation ID"] || ""}</td>
                         <td>${user["Conversations Created At"] || ""}</td>
-                        <td><pre>${user.Messages || ""}</pre></td>
+                        <td><pre style="white-space: pre-wrap;">${formattedMessages}</pre></td>
                     </tr>
                 `;
             });
