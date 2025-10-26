@@ -70,51 +70,31 @@
                 let formattedMessages = "";
 
                 if (user.Messages) {
-                    // Match all Query and Response lines properly, even when continuous
-                    const pattern = /\[ ?Query\s*\|\s*([^\]]+)\]:([\s\S]*?)(?=\[ ?Query|\Z)/g;
-                    const matches = [...user.Messages.matchAll(pattern)];
+                    // Split messages into lines
+                    const lines = user.Messages.split("\n");
 
-                    // Build message pairs
-                    const pairs = matches.map(match => {
-                        const queryTimestamp = match[1].trim();
-                        const block = match[2].trim();
-
-                        // Find response inside the same block (if present)
-                        const respMatch = block.match(/\[ ?Response\]:([\s\S]*)/);
-                        const queryText = block.split("[Response]:")[0].trim();
-                        const responseText = respMatch ? respMatch[1].trim() : "";
-
-                        return {
-                            timestamp: new Date(queryTimestamp),
-                            displayTime: queryTimestamp,
-                            query: queryText,
-                            response: responseText
-                        };
-                    });
-
-                    // Sort by timestamp
-                    pairs.sort((a, b) => a.timestamp - b.timestamp);
-
-                    // Format with bold headers and preserved spacing
-                    pairs.forEach(pair => {
-                        formattedMessages += `<b>[Query | ${pair.displayTime}]</b>: ${pair.query}\n`;
-                        formattedMessages += `<b>[Response]</b>: ${pair.response}\n`;
+                    // Add line breaks for each query/response pair
+                    lines.forEach(line => {
+                        if (line.trim() !== "") {
+                            formattedMessages += line.trim() + "\n";
+                        }
                     });
                 }
 
-                tableHTML += `
+                tableHTML += 
                     <tr>
                         <td>${user.Email || ""}</td>
                         <td>${user["Conversation ID"] || ""}</td>
                         <td>${user["Conversations Created At"] || ""}</td>
                         <td><pre style="white-space: pre-wrap;">${formattedMessages}</pre></td>
                     </tr>
-                `;
+                ;
             });
 
             tableHTML += "</table>";
             container.innerHTML = tableHTML;
         }
+
 
         async function refreshTable() {
             try {
