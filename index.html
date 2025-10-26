@@ -67,41 +67,40 @@
             tableHTML += "<tr><th>Email</th><th>Conversation ID</th><th>Conversation Created</th><th>Messages</th></tr>";
 
             data.forEach(user => {
-                let messagePairs = [];
+                let formattedMessages = "";
 
                 if (user.Messages) {
-                    const lines = user.Messages.split("\n").filter(line => line.trim() !== "");
+                    // Match all Query and Response lines properly, even when continuous
+                    const pattern = /\[ ?Query\s*\|\s*([^\]]+)\]:([\s\S]*?)(?=\[ ?Query|\Z)/g;
+                    const matches = [...user.Messages.matchAll(pattern)];
 
-                    let currentQuery = null;
+                    // Build message pairs
+                    const pairs = matches.map(match => {
+                        const queryTimestamp = match[1].trim();
+                        const block = match[2].trim();
 
-                    lines.forEach(line => {
-                        const queryMatch = line.match(/^\[ Query \| (.+?) \]:(.*)/);
-                        const responseMatch = line.match(/^\[ Response \]:(.*)/);
+                        // Find response inside the same block (if present)
+                        const respMatch = block.match(/\[ ?Response\]:([\s\S]*)/);
+                        const queryText = block.split("[Response]:")[0].trim();
+                        const responseText = respMatch ? respMatch[1].trim() : "";
 
-                        if (queryMatch) {
-                            currentQuery = {
-                                timestamp: new Date(queryMatch[1].trim()),
-                                originalTimestamp: queryMatch[1].trim(),
-                                query: queryMatch[2], // keep original spacing
-                                response: ""
-                            };
-                            messagePairs.push(currentQuery);
-                        } else if (responseMatch && currentQuery) {
-                            currentQuery.response = responseMatch[1]; // keep original spacing
-                            currentQuery = null;
-                        }
+                        return {
+                            timestamp: new Date(queryTimestamp),
+                            displayTime: queryTimestamp,
+                            query: queryText,
+                            response: responseText
+                        };
                     });
 
-                    // Sort by Query timestamp
-                    messagePairs.sort((a, b) => a.timestamp - b.timestamp);
-                }
+                    // Sort by timestamp
+                    pairs.sort((a, b) => a.timestamp - b.timestamp);
 
-                // Format the messages with bold [Query] and [Response]
-                let formattedMessages = "";
-                messagePairs.forEach(pair => {
-                    formattedMessages += `<b>[Query | ${pair.originalTimestamp}]</b>: ${pair.query}\n`;
-                    formattedMessages += `<b>[Response]</b>: ${pair.response}\n`;
-                });
+                    // Format with bold headers and preserved spacing
+                    pairs.forEach(pair => {
+                        formattedMessages += `<b>[Query | ${pair.displayTime}]</b>: ${pair.query}\n`;
+                        formattedMessages += `<b>[Response]</b>: ${pair.response}\n`;
+                    });
+                }
 
                 tableHTML += `
                     <tr>
